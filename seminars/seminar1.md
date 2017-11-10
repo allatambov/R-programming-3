@@ -97,7 +97,7 @@ dohod <- 1573
 
 Известно, что в базе данных хранятся показатели по 3 странам за 5 лет. Таблица выглядит примерно так (первые 7 строк):
 
-<table style="text-align:center"><tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td>r</td><td>r2</td></tr>
+<table style="text-align:center"><tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td>country</td><td>year</td></tr>
 <tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">1</td><td>France</td><td>2000</td></tr>
 <tr><td style="text-align:left">2</td><td>France</td><td>2001</td></tr>
 <tr><td style="text-align:left">3</td><td>France</td><td>2002</td></tr>
@@ -105,10 +105,18 @@ dohod <- 1573
 <tr><td style="text-align:left">5</td><td>France</td><td>2004</td></tr>
 <tr><td style="text-align:left">6</td><td>Italy</td><td>2000</td></tr>
 <tr><td style="text-align:left">7</td><td>Italy</td><td>2001</td></tr>
+<tr><td style="text-align:left">8</td><td>Italy</td><td>2002</td></tr>
+<tr><td style="text-align:left">9</td><td>Italy</td><td>2003</td></tr>
+<tr><td style="text-align:left">10</td><td>Italy</td><td>2004</td></tr>
+<tr><td style="text-align:left">11</td><td>Spain</td><td>2000</td></tr>
+<tr><td style="text-align:left">12</td><td>Spain</td><td>2001</td></tr>
+<tr><td style="text-align:left">13</td><td>Spain</td><td>2002</td></tr>
+<tr><td style="text-align:left">14</td><td>Spain</td><td>2003</td></tr>
+<tr><td style="text-align:left">15</td><td>Spain</td><td>2004</td></tr>
 <tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr></table>
 
 -   Создайте вектор с названиями стран.
--   Создайте вектор, который мог бы послужить первым столбцом в таблице, представленной выше (подумайте, какую длину имеет этот вектор).
+-   Создайте вектор, который мог бы послужить вторым столбцом в таблице, представленной выше (подумайте, какую длину имеет этот вектор).
 
 **Задача 7.**
 
