@@ -97,6 +97,16 @@ dohod <- 1573
 
 Известно, что в базе данных хранятся показатели по 3 странам за 5 лет. Таблица выглядит примерно так (первые 7 строк):
 
+<table style="text-align:center"><tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td>r</td><td>r2</td></tr>
+<tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">1</td><td>France</td><td>2000</td></tr>
+<tr><td style="text-align:left">2</td><td>France</td><td>2001</td></tr>
+<tr><td style="text-align:left">3</td><td>France</td><td>2002</td></tr>
+<tr><td style="text-align:left">4</td><td>France</td><td>2003</td></tr>
+<tr><td style="text-align:left">5</td><td>France</td><td>2004</td></tr>
+<tr><td style="text-align:left">6</td><td>Italy</td><td>2000</td></tr>
+<tr><td style="text-align:left">7</td><td>Italy</td><td>2001</td></tr>
+<tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr></table>
+
 -   Создайте вектор с названиями стран.
 -   Создайте вектор, который мог бы послужить первым столбцом в таблице, представленной выше (подумайте, какую длину имеет этот вектор).
 
