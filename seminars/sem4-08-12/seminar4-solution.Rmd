@@ -1,0 +1,70 @@
+---
+title: "Семинар 4. Базы данных и dplyr."
+subtitle: "Решения"
+author: "Алла Тамбовцева"
+output: html_document
+---
+1. Загрузите базу данных moscow-buildings.csv и сохраните ее как df_build. Посмотрите на нее.
+```{r}
+df_build <- read.csv("moscow-buildings.csv", encoding = "UTF-8")
+View(df_build)
+```
+
+2. Используя функции dplyr, удалите из базы данных строки, в которых значения года построки не указаны ("н.д."), а после превратите столбец house_year в числовой (R будет воспринимать столбец как факторный, поэтому нужно сначала превратить его в текстовый, а затем - в числовой).
+
+```{r}
+library(dplyr)
+df_build <- df_build %>% filter(house_year != "н.д.") %>% 
+  mutate(house_year = as.numeric(as.character(house_year)))
+```
+Да, в районе Беговой много пропущенных значений (н.д.), после их удаления осталось всего два дома.
+
+
+3. Посмотрите на минимальное и максимальное значения года постройки. Разумны ли они? Если нет, уберите из базы данных "странные" значения годы постройки.
+
+```{r}
+df_build %>% summarise(min_year = min(house_year), 
+                       max_year = max(house_year))
+```
+
+Не очень разумные, явно есть опечатки или ошибки при парсинге сайта Реформы ЖКХ (годы склеились и прочее).
+
+Посмотрим на "странные" значения:
+```{r}
+View(df_build %>% filter(house_year < 1300))
+View(df_build %>% filter(house_year > 2017))
+```
+
+Уберем их из базы:
+```{r}
+df_build <- df_build %>% filter(house_year > 1300, house_year < 2017)
+```
+
+4. Выберите из базы данных строки, соответствующие Басманному району и сохраните их в базу basm_data.
+```{r}
+basm_data <- df_build %>% filter(area_name == "муниципальный округ Басманный")
+View(basm_data)
+```
+
+5. Сгруппируйте данные в базе по районам и посмотрите, сколько домов в базе относятся к каждому району.
+```{r}
+df_build %>% group_by(area_name) %>% tally
+View(df_build %>% group_by(area_name) %>% tally)
+```
+
+6. Найдите средний возраст дома (возраст - в годах, считаем от 2017) по каждому району. Подсказка: сначала добавьте переменную house_age ("возраст дома").
+
+```{r}
+df_build %>% 
+  mutate(house_age = 2017 - house_year) %>% 
+  summarise(mean(house_age))
+```
+
+7. Найдите улицу с самым старым домом.
+
+```{r}
+df_build %>% 
+  group_by(street_name) %>% 
+  summarise(min_year = min(house_year)) %>%
+  arrange(min_year)
+```
