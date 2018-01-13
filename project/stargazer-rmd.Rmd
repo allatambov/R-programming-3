@@ -1,0 +1,39 @@
+---
+title: "Stargazer в Rmarkdown"
+author: "Алла Тамбовцева"
+output: html_document
+---
+Таблицы, полученные с помощью библиотеки `stargazer`, можно копировать прямо в Rmd-файл, если этот файл будет компилироваться в html-страницу (так как `stargazer` умеет выводить html-код для таблиц). 
+
+Более того, `stargazer` умеет создавать пользовательские таблицы, а не таблицы с описательными статистиками или регрессиями, встроенными в него и используемые по умолчанию.
+
+```{r, message=FALSE}
+library(stargazer)
+library(dplyr)
+```
+
+*Пример:* некоторые описательные статистики по весу цыплят в пяти группах -- в зависимости от того, каким кормом их кормили (данные из встроенной в R базы `chickwts`). 
+
+```{r}
+my.table <- chickwts %>% 
+  group_by(feed) %>% 
+  summarise(n = n(), mean = round(mean(weight)), sd = round(sd(weight)))
+
+stargazer(my.table, type = "html", summary = FALSE, 
+          title = "Chickens' weight by groups", 
+          rownames = FALSE)
+```
+
+Аргумент `summary=FALSE` говорит stargazer, что мы хотим вывести свою таблицу, а не таблицу с фиксированными описательными статистиками (N, Mean, St.Dev, Min, Max), которая в него встроена по умолчанию.
+
+Функция `stargazer()` выдает в консоль html-код для таблицы, который можно скопировать прямо в Rmd-файл:
+
+<table style="text-align:center"><caption><strong>Chickens' weight by groups</strong></caption>
+<tr><td colspan="4" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">feed</td><td>n</td><td>mean</td><td>sd</td></tr>
+<tr><td colspan="4" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">1</td><td>12</td><td>324</td><td>64</td></tr>
+<tr><td style="text-align:left">2</td><td>10</td><td>160</td><td>39</td></tr>
+<tr><td style="text-align:left">3</td><td>12</td><td>219</td><td>52</td></tr>
+<tr><td style="text-align:left">4</td><td>11</td><td>277</td><td>65</td></tr>
+<tr><td style="text-align:left">5</td><td>14</td><td>246</td><td>54</td></tr>
+<tr><td style="text-align:left">6</td><td>12</td><td>329</td><td>49</td></tr>
+<tr><td colspan="4" style="border-bottom: 1px solid black"></td></tr></table>
