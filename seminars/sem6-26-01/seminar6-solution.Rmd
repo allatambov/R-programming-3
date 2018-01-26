@@ -1,0 +1,119 @@
+---
+title: "Семинар 6. Описательные статистики в R."
+subtitle: "Решения"
+author: "Алла Тамбовцева"
+date: '26 января 2018 г '
+output: html_document
+---
+
+1. Зайдите на сайт COMPARATIVE POLITICAL DATA SET (http://www.cpds-data.org/index.php/data). Скачайте базу данных Comparative Political Data Set в формате .dta. Загрузите базу данных в R (не забудьте про соответствующую библиотеку).
+
+```{r, message=FALSE}
+library(foreign)
+
+polit <- read.dta("polit.dta")
+```
+
+2. Посмотрите на загруженную базу данных. Оставьте в базе данных только переменные year, country, poco, eu, gov_right1, gov_cent1, gov_left1, womenpar и только те наблюдения, которые относятся к 2015 году. Используйте для этого библиотеку dplyr.
+
+```{r, message=FALSE}
+View(polit)
+
+library(dplyr)
+
+polit <- polit %>% select(year, country, poco, eu, gov_right1, gov_cent1, gov_left1, womenpar) %>% filter(year == 2015)
+```
+
+3. Сколько наблюдений осталось в базе? Все ли типы переменных правильны? Если нет, поправьте.
+
+```{r, results='hide'}
+str(polit) # все ок
+```
+
+4. Выведите описательные статистики для всех переменных в базе.
+
+```{r}
+summary(polit)
+```
+
+5. Используя библиотеку stargazer, выгрузите таблицу описательных статистик в html-файл (table.htm). Уберите из таблицы описательные статистики для year, добавьте заголовок таблицы, назовите строки более красиво (right, center, left, women). Сделайте так, чтобы в таблице из статистик остались только среднее и стандартное отклонение. Добавьте в таблицу медиану. Оставьте в числовых значениях только 2 знака после запятой. Добавьте комментарий к таблице.
+
+```{r, message=FALSE, results='hide'}
+library(stargazer)
+
+stargazer(polit, out = "table.htm") 
+
+# убираем year
+
+stargazer(select(polit, -year), out = "table.htm") 
+
+# добавляем заголовок и названия строк
+
+stargazer(select(polit, -year), out = "table.htm",
+          title = "Summary statistics",
+          covariate.labels = c("right", "center", "left", "women"))
+          
+# оставляем только среднее и ст.отклонение и добавляем медиану
+
+stargazer(select(polit, -year), out = "table.htm",
+          title = "Summary statistics",
+          covariate.labels = c("right", "center", "left", "women"), 
+          omit.summary.stat = c("max", "min", "n"), 
+          median = TRUE)
+
+# оставляем 2 знака после запятой и добавляем комментарий
+
+stargazer(select(polit, -year), out = "table.htm",
+          title = "Summary statistics",
+          covariate.labels = c("right", "center", "left", "women"), 
+          omit.summary.stat = c("max", "min", "n"), 
+          median = TRUE,
+          digits = 2,
+          notes = "Comparative political data set, 2015")
+
+```
+
+6. Сгруппируйте базу данных по переменной poco. Выведите на экран таблицу с количеством стран.
+
+```{r}
+polit %>% group_by(poco) %>% tally
+``` 
+
+7. Выведите таблицу частот для переменной poco. Постройте столбиковую диаграмму для этой переменной. Приведите ее в порядок.
+
+```{r}
+tab <- table(polit$poco)
+View(tab)
+barplot(tab)
+
+
+barplot(tab, main = "Countries", col = c("darkblue", "red"))
+```
+
+8. Постройте гистограмму для переменной womenpar. Приведите ее в порядок.
+
+```{r}
+hist(polit$womenpar)
+
+hist(polit$womenpar, main = "Share of women in parliament", 
+     col = "plum",
+     xlab = "share of women (in %)",
+     xlim = c(0, 50))
+```
+
+9. Постройте гистограмму для переменной gov_left1 для пост-коммунистических стран. Постройте гистограмму для переменной gov_left1 для всех остальных стран. Важно: считайте, что ваши две гистограммы должны быть сравнимы. Гистограммы не должны быть на одном графике, но по ним должно быть возможным сравнение распределения показателя для двух групп стран.
+
+```{r}
+postcom <- filter(polit, poco == "Post-communist")
+no_postcom <- filter(polit, poco == "No")
+hist(postcom$gov_left1)
+hist(no_postcom$gov_left1) # и так сравнимы, обе строятся на [0,100]
+```
+
+10. Постройте "ящик с усами" для переменной womenpar. Постройте "ящики с усами" для двух групп стран (пост-коммунистические и другие) на одном графике. Подсказка: `boxplot(x ~ group)`.
+
+```{r}
+boxplot(womenpar ~ poco, data = polit, 
+        col = c("lightblue", "tomato"))
+```
+

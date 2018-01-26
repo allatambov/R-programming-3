@@ -1,0 +1,96 @@
+---
+title: "Семинар 8. Решения."
+author: "Алла Тамбовцева"
+date: '26 января 2018 г '
+output: html_document
+---
+
+1.  Загрузите в R базу данных по фильмам `filmdeathcounts.csv`.
+
+```{r, message = FALSE}
+mov <- read.csv("filmdeathcounts.csv")
+View(mov)
+library(dplyr)
+```
+
+2.  Удалите из базы пропущенные значения. Оставьте в базе данных только наблюдения с 1989 по 2010 год включительно.
+
+```{r}
+mov <- na.omit(mov)
+mov <- mov %>% filter(Year >= 1989 & Year <= 2010)
+```
+
+3.  Сколько различных жанров фильмов представлено в базе (имеются в виду сочетания жанров)?
+
+```{r}
+Table <- mov %>% group_by(Genre) %>% tally
+dim(Table)
+```
+
+4. Добавьте в базу данных столбец Genre\_abb, который представляет собой сокращенные названия для жанров. Используйте функцию `abbreviate()`.
+
+```{r}
+mov <- mov %>% mutate(Genre_abb = abbreviate(Genre))
+View(mov)
+```
+
+5. Сколько в базе данных фильмов разных лет выпуска? Постройте график, иллюстрирующий распределение фильмов по годам. Скорректируйте оси (используйте аргумент `las`, чтобы подписи по оси x были повернуты на 90 градусов и не перекрывали друг друга). Добавьте заголовок графика, поменяйте цвет.
+
+```{r}
+tab <- table(mov$Year)
+tab
+barplot(tab, las = 2, main = "Films by years", col = "skyblue", ylim = c(0, 50))
+```
+
+6. Постройте гистограмму для переменной Length\_Minutes. Наложите график плотности нормального распределения с соответствующими параметрами.
+
+```{r}
+mu <- mean(mov$Length_Minutes)
+sigma <- sd(mov$Length_Minutes)
+hist(mov$Length_Minutes, 
+     main = "Distribution of film length (in min)", 
+     col = "plum", freq = FALSE)
+curve(dnorm(x, mean = mu, sd = sigma), add = TRUE)
+```
+
+7. Постройте диаграмму рассеяния для переменных Body\_Count и IMDB\_Rating. Что можно сказать о связи между этими переменными, глядя на график?
+
+```{r}
+plot(mov$Body_Count, mov$IMDB_Rating)
+```
+
+8. Как Вы думаете, какой коэффициент корреляции лучше использовать для оценки связи между переменными Body\_Count и IMDB\_Rating? Посчитайте соответствующий коэффициент корреляции между этими переменными. Проверьте гипотезу о равенстве истинного коэффициента корреляции нулю. Сделайте выводы.
+
+```{r}
+cor.test(mov$Body_Count, mov$IMDB_Rating, method = "spearman")
+```
+
+9. Сгруппируйте наблюдения по переменной Year. Используя знания о структуре выдачи `cor.test()`, создайте такую таблицу (приведены первые три строки).
+
+```{r, warning=FALSE}
+corr.tab <-mov %>% group_by(Year) %>% 
+  summarise(corr = round(cor.test(Body_Count, Length_Minutes, method  = "spearman")$estimate, 2),
+  pvalue = round(cor.test(Body_Count, Length_Minutes, method  = "spearman")$p.value, 3))
+View(corr.tab)
+```
+
+10. Фильмы какого жанра/жанров наиболее жестокие (содержат наибольшее число смертей)? А какие режиссеры наименее жестокие? Назовите 5 первых "самых добрых" режиссеров.
+
+```{r}
+# наиболее жестокие
+
+mov %>% group_by(Genre) %>% summarise(m = max(Body_Count)) %>% arrange(desc(m))
+
+# самые добрые
+
+mov %>% group_by(Director) %>% summarise(m = max(Body_Count)) %>% arrange(m) %>% head(5)
+```
+
+11. Создайте переменную Death\_Min - число смертей, приходящихся на одну минуту фильма. Какой фильм лидирует по этому показателю?
+
+```{r}
+mov <- mov %>% mutate(Death_Min = Body_Count / Length_Minutes)
+
+# лидер по Death_Min
+mov %>% arrange(desc(Death_Min)) %>% head(1) 
+```
