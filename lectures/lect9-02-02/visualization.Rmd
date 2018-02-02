@@ -1,0 +1,157 @@
+---
+title: "Основы программирования в R"
+author: "Алла Тамбовцева"
+date: '22 ноября 2017 г '
+output: html_document
+---
+
+### Принципы визуализации данных 
+
+1. Тип визуализации должен соответствовать цели, для которой она создается.
+
+    *Цель:* хотим проиллюстрировать изменения температуры тела бобров (да, бобров!) с течением времени.
+    
+    *Хорошая визуализация:*
+
+    ```{r, echo = FALSE, message = FALSE, out.width = '70%'}
+    library(ggplot2)
+    beav <- beaver1
+    beav$id <- 1:dim(beaver1)[1]
+    ggplot(data = beav, aes(x = id, y = temp)) +
+    geom_line() + labs(title = "Beavers: dynamics of body temperature", x = "Observation id", y = "Temperature, C")
+    
+    ```
+    
+    *Плохая визуализация:*
+    
+    ```{r, echo = FALSE, out.width = '70%'}
+    ggplot(data = beav, aes(x = "", y = temp)) + geom_boxplot() +
+    labs(title = "Beavers: body temperature", x = "", y = "Temperature, C")
+    ```
+
+Почему плохая? Потому что всё, что можно извлечь в данном случае из ящика с усами, это то, что температура с течением времени менялась, иногда сильно отклоняясь от медианного значения в большую или меньшую сторону.  
+
+2. Визуализация должна помогать восприятию информации, а не мешать.
+
+    *Плохо:*
+    
+    ```{r, echo = FALSE, message = FALSE, out.width = '70%'}
+    library(ggimage)
+    library(grid)
+    library(dplyr)
+
+    beav.sample <- beav %>% filter(id <= 20)
+    image <- rep("/home/oem/depressed.gif", dim(beav.sample)[1])
+
+    ggplot(data = beav.sample, aes(x = id, y = temp)) +
+    geom_line() + labs(title = "Beavers: dynamics of body temperature", 
+                      x = "Observation id", y = "Temperature, C") +  
+    geom_image(aes(image = image), size = 0.1)
+    ```
+    
+    [Депрессивные бобры по подсказке Наташи взяты [отсюда](http://blog.invisible.ru/)].
+    
+    *Плохо:*
+    
+    
+    ```{r, echo = FALSE, message = FALSE, out.width = '70%'}
+    
+    library(png)
+    library(grid)
+    
+    img <- readPNG("/home/oem/beaver2.png", FALSE)
+    g <- rasterGrob(img)
+    
+    ggplot(data = beav, aes(x = id, y = temp)) + theme_bw() + 
+    annotation_custom(g, xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf) + 
+    geom_line(lwd = 1) + labs(title = "Beavers: dynamics of body temperature", 
+                      x = "Observation id", y = "Temperature, C") 
+    ```
+
+[Активные бобры взяты из мультфильма "Осторожно, щука!"]
+
+3. Визуализация должна быть понятной (особенно это касается не самых распространенных типов графиков).
+
+    Даже с заголовком "Пропущенные значения" этот график напоминает непосвященным людям абстрактное полотно в цветах подгорающего дедлайна:
+
+    ```{r, echo = FALSE, message = FALSE, out.width = '70%'}
+    library(VIM)
+    matrixplot(airquality, main = "Пропущенные значения", sub = "Air Quality")
+    ```
+
+    Поэтому лучше добавить описание графика в текст работы или добавить комментарий непосредственно к самому графику (например, `\caption*{}`в LaTeX): 
+
+    *Пропущенные значения в базе данных обозначены красным цветом, наименьшие значения обозначены белым цветом, набольшие -- черным.*
+
+    Конечно, необязательно для каждого графика составлять подробное описание, но легенда в случае необходимости у графика должна быть всегда:
+    
+    ```{r,  echo = FALSE, message = FALSE, out.width = '70%'}
+beav <- beav %>% mutate(Activity = factor(activ))
+ggplot(data = beav, aes(x = id, y = temp, color = Activity)) +
+  geom_line() + 
+  labs(title = "Beavers: dynamics of body temperature", x = "Observation id", y = "Temperature, C") +
+  scale_color_manual(values = c("red", "blue"), labels = c("Not active outside the retreat", "Active outside the retreat"))
+    ```
+
+4. Визуализация должна отражать то, что мы хотим подчеркнуть. У графиков должен быть подобран правильный масштаб, шкалы осей и прочее.
+
+    *Хотим показать:* рост ВВП на душу населения странах Африки за несколько лет. 
+    
+    *Не очень получается:*
+
+    ```{r, echo = FALSE, message = FALSE, out.width = '70%'}
+af <- read.csv("/home/oem/africa.csv")
+cnts <- c("Djibouty", "Malawi", "Tanzania", "Zambia")
+af %>% filter(Cnt %in% cnts) %>% 
+ggplot(aes(x = year, y = gdp_growth, group = Cnt)) + geom_line() + 
+  labs(y = "GDP growth") + 
+  scale_x_continuous(breaks = 2000:2009) + 
+  scale_y_continuous(limits = c(-50, 50)) +
+  theme(axis.text.x = element_text(angle = 45)) + 
+  facet_wrap(~Cnt)
+    ```
+
+    *Получше:*
+    
+    ```{r, echo = FALSE, message = FALSE, out.width = '70%'}
+af <- read.csv("/home/oem/africa.csv")
+cnts <- c("Djibouty", "Malawi", "Tanzania", "Zambia")
+af %>% filter(Cnt %in% cnts) %>% 
+ggplot(aes(x = year, y = gdp_growth, group = Cnt)) + geom_line() + 
+  labs(y = "GDP per capita growth") + 
+  scale_x_continuous(breaks = 2000:2009) + 
+  scale_y_continuous(limits = c(-10, 10)) +
+  theme(axis.text.x = element_text(angle = 45)) + 
+  facet_wrap(~ Cnt)
+    ```
+    
+5. Визуализация должна быть разборчивой. Не нужно делать график с бледными желтыми точками на белом фоне или пытаться уместить на график информацию по всем странам в базе.
+
+    *Не надо:*
+
+    ```{r, echo = FALSE, message = FALSE, out.width = '70%'}
+c1 <- seq(from = 1, to = 45, by = 3)
+c2 <- rep(c(2, 4, 6), 5)
+c3 <- unlist(strsplit("CATCHMEIFYOUCAN", ""))
+my.tab <- data.frame(X = c1, Y = c2, LET = c3)
+
+ggplot(data = my.tab, aes(x = X, y = Y)) + 
+  geom_text(aes(label = LET), color = "yellow") + geom_line(color = "yellow", lty = 2) + 
+  theme_bw()
+    ```
+
+    *И так тоже:*
+
+    ```{r, echo = FALSE, message = FALSE, out.width = '70%'}
+ggplot(data = af, aes(x = year, y = gdp_growth, color = Cnt)) + geom_line() + 
+  labs(y = "GDP per capita growth") + 
+  scale_x_continuous(breaks = 2000:2009) + 
+  scale_y_continuous(limits = c(-20, 20)) +
+  theme(axis.text.x = element_text(angle = 45))
+    ```
+
+    
+
+
+
+    
