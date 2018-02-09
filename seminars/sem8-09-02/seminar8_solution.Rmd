@@ -1,0 +1,89 @@
+---
+title: "Семинар 8. Решения."
+date: '9 февраля 2018'
+output: github_document
+---
+Все графики строятся с помощью библиотеки `ggplot2`. 
+
+```{r}
+library(ggplot2)
+library(dplyr)
+```
+
+1. Загрузите базу данных `demography.csv`. В ней содержатся данные по населению Белгородской и Калужской областей за 2016 год (источник -- Росстат).
+
+```{r}
+df <- read.csv("https://github.com/allatambov/R-programming-3/blob/master/seminars/sem8-09-02/demography.csv", encoding = "UTF-8")
+```
+
+
+2. Создайте переменную *young_share* -- процент населения возраста, моложе трудоспособного. Создайте переменную *trud_share* -- процент населения трудоспособного возраста и *old_share* -- процент населения возраста, старше трудоспособного.
+
+```{r}
+df <- df %>% mutate(young_share = young_total/popul_total * 100,
+              trud_share = wa_total/popul_total * 100,
+              old_share = ret_total/popul_total * 100)
+```
+
+3. Постройте гистограмму для доли трудоспособного населения в процентах. Измените цвет гистограммы, добавьте rugs. Добавьте вертикальную линию, которая отчерчивает медианное значение доли трудоспособного населения в процентах.
+
+```{r}
+ggplot(data = df, aes(x = trud_share)) + 
+  geom_histogram(fill = "tomato", color = "black", bins = 10) +
+  labs(title = "Working age", x = "People in working age, %") +
+  geom_vline(xintercept = median(df$trud_share), color = "blue", 
+             lwd = 1, lty = 2) + geom_rug()
+```
+
+
+4. Постройте сглаженные графики плотности распределения для доли трудоспособного населения в процентах по регионам (два графика в одной плоскости). Настройте цвета и прозрачность заливки. По графикам плотности определите, имеет ли смысл для визуализации распределения доли трудоспособного населения строить скрипичные диаграммы (*violin plot*). Если да, постройте их (так же по группам). Если нет, постройте ящики с усами. 
+
+```{r}
+# сглаженные графики плотности
+ggplot(data = df, 
+       aes(x = trud_share, group = region, fill = region)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = c("yellow", "green"))
+
+# скрипичные диаграммы
+ggplot(data = df, 
+       aes(x = "", y = trud_share, group = region, fill = region)) +
+  geom_violin() +
+  scale_fill_manual(values = c("yellow", "green"))
+```
+
+
+5. Постройте диаграмму рассеяния для переменных *young_share* и *old_share*. Можно ли сказать, что чем больше процент молодого населения (моложе трудоспособного населения), тем меньше процент пожилых людей (старше трудоспособного возраста)? Поменяйте цвет и тип маркера для точек.
+
+```{r}
+ggplot(data = df, aes(x = young_share, y= old_share)) +
+  geom_point(color = "brown", shape = 8, size = 4) + theme_bw()
+```
+
+
+6. Создайте переменную *male_share* -- доля мужского населения в районе/городе (в процентах). Создайте переменную *male*, которая принимает значение 1, если доля мужчин в муниципальном районе/городе больше доли женщин, и значение 0 -- во всех остальных случаях.
+
+```{r}
+df <- df %>% mutate(female = young_female + wa_female + ret_female,
+                    male = young_male + wa_male + ret_male) %>% 
+             mutate(fe_share = female / popul_total * 100,
+                    ma_share = male / popul_total * 100) %>%
+             mutate(Male = factor(ifelse(ma_share > fe_share, 1, 0)))
+```
+
+
+7. Постройте пузырьковую диаграмму (*bubble plot*) для переменных *young_share* и *old_share*, учитывая информацию о доле мужчин в районе и о том, преобладают ли мужчины в районе или нет.
+
+```{r}
+ggplot(data = df, aes(x = young_share, y= old_share)) +
+  geom_point(aes(size = ma_share, color = Male))
+```
+
+
+8. Постройте столбиковую диаграмму (*bar plot*), которая показывала бы, сколько в базе данных районов Белгородской области, а сколько -- Калужской.
+
+```{r}
+ggplot(data = df, aes(x = region)) + geom_bar(fill = "purple", color = "black") + 
+  scale_y_continuous(breaks = seq(0, 30, by = 5)) # больше делений по оси y
+```
+
