@@ -1,0 +1,99 @@
+---
+title: "Семинар 8. Решения."
+author: "Алла Тамбовцева"
+date: '16 ноября 2017 г '
+output: github_document
+---
+
+1. Дан вектор оценок студентов `grades10` (оценки указаны в 10-балльной шкале). Напишите код, который на основе вектора `grades10` создает вектор `grades5` - вектор оценок в 5-балльной шкале:
+
+* 0 - это 1
+* менее 4 - это 2
+* [4, 5] - это 3
+* [6, 7] - это 4
+* [8, 10] - это 5
+
+```{r}
+grades10 <- c(1, 4, 7, 8, 4, 3, 10, 9)
+n <- length(grades10)
+grades5 <- rep(NA, n)
+indices <- 1:n
+
+for (i in indices){
+  if (grades10[i] == 0){grades5[i] <- 1}
+  if (grades10[i] > 0 & grades10[i] < 4){grades5[i] <- 2}
+  if (grades10[i] >= 4 & grades10[i] <= 5){grades5[i]<-3}
+  if (grades10[i] >= 6 & grades10[i] <=7){grades5[i] <-4}
+  if (grades10[i] >= 8){grades5[i] <- 5}
+}
+```
+
+
+2. Напишите код, который запрашивает у пользователя размерность матрицы (предполагается, что пользователь вводит число строк и столбцов через пробел), сохраняет их и создает единичную матрицу заданной размерности. Если невозможно создать единичную матрицу заданной размерности, на экран выводится сообщение "Impossible to create an identity matrix with such dimensions.". 
+
+*Подсказка:* единичная матрица - квадратная матрица (число строк равно числу столбцов), на главной диагонали которой стоят 1, а все остальные элементы равны 0. Пример: 
+
+```
+[1 0 0]
+[0 1 0]
+[0 0 1]
+```
+
+```{r}
+dims <- readline("Enter dimensions: ")
+dims_vector <- as.integer(unlist(strsplit(dims, " ")))
+nrows <- dims_vector[1]
+ncols <- dims_vector[2]
+
+if (nrows != ncols){print("Impossible to create an identity matrix with such dimensions.")} else{
+  M <- matrix(0, nrows, ncols)
+  for (i in 1:nrows){
+    for (j in 1:ncols){
+      if (i == j){
+        M[i,j] <- 1
+      }
+    }
+  }
+    }
+```
+
+3. Дан вектор стран: 
+
+```
+cnt <- c('France', 'Hungary', 'Ukraine', 'Romania', 'Germany', 'Russia', 'Finland', 'Italy', 'Spain')
+```
+
+Напишите код, который перебирает элементы вектора `cnt` до тех пор, пока не дойдет до России. Если название страны отлично от 'Russia', на экран должно выводиться сообщение "It is not Russia.", а если название совпадает с 'Russia', на экран должно выводиться сообщение: "Russia is found. Its number is n", где `n` - порядковый номер России в списке.
+
+а) Используйте цикл `for`.
+
+```{r}
+cnt <- c('France', 'Hungary', 'Ukraine', 'Romania', 'Germany', 'Russia', 'Finland', 'Italy', 'Spain')
+
+for (c in cnt){
+  if (c == "Russia"){
+    print(sprintf("Russia is found. Its number is %i", which(cnt == "Russia")))
+    break
+  } else {
+    print("It is not Russia.")
+  }
+}
+```
+
+б) используйте цикл `while`. 
+
+```{r}
+i <- 1
+c <- cnt[i]
+
+while (c != 'Russia'){
+  i <- i + 1
+  c <- cnt[i]
+  print("It is not Russia.")
+}
+print(sprintf("Russia is found. Its number is %i", which(cnt == "Russia")))
+```
+
+*Внимание:* Ваш код должен работать корректно и в том случае, если мы изменим порядок элементов в векторе `cnt`!
+
+

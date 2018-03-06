@@ -1,0 +1,88 @@
+---
+title: "Семинар 11. Решения."
+author: "Алла Тамбовцева"
+date: '02 марта 2018 г '
+output: github_document
+---
+
+1. Напишите функцию, которая просит пользователя ввести свое имя, и если оно совпадает Вашим, выводит на экран "[Name], welcome to R! I missed you.", если не совпадает, то выводит на экран "Sorry, R is not available now.". Подразумевается, что R знает Ваше имя (при желании можете написать функцию, которая вытаскивает Ваше имя пользователя на компьютере и сравнивает с ним).
+
+```{r}
+welcome <- function(){
+  name <- readline("Enter your name: ")
+  if (name == "Alla"){print(sprintf("%s, welcome to R! I missed you.", name))}
+  else print("Sorry, R is not available now.")
+}
+```
+
+2. Напишите функцию, которая принимает на вход числовой вектор и возвращает вектор, состоящий из квадратов элементов вектора, поданного на вход. Можете для определенности назвать функцию `get_squares`.
+
+```{r}
+get_squares <- function(vec){
+  return(vec^2)
+}
+
+w <- c(-1, 4, 6, 10)
+get_squares(w)
+```
+
+3. Напишите функцию `smart_squares`, которая принимает на вход вектор, и если он числовой, то возвращает вектор из квадратов его элементов, а если нет -- возвращает вектор из пропущенных значений и выводит на экран сообщение "Your vector is not numeric."
+
+```{r}
+smart_squares <- function(vec){
+  if (is.character(vec) == TRUE){
+    result <- rep(NA, length(vec))
+    print("Your vector is not numeric.")}
+  else{
+    result <- vec^2
+  }
+  return(result)
+}
+
+smart_squares(c(2, 4, 5))
+smart_squares(c("6", "5"))
+```
+
+4. Напишите функцию, которая принимает на вход базу данных, удаляет в ней пропущенные значения и выводит на экран описательные статистики по всем переменным. Для тестирования можете взять любую базу данных, например, с наших семинаров.
+
+```{r}
+SumData <- function(df){
+  df <- na.omit(df)
+  summary(df)
+}
+
+SumData(mtcars)
+```
+
+5. Напишите функцию, которая принимает на вход путь к папке, в которой лежит база данных (например, "C:/Users/my-folder") и название файла с базой данных (считайте, что все хранится в csv-формате), и возвращает вектор, содержащий следующую информацию: число переменных в базе, число наблюдений в базе, количество строк, включающих пропущенные значения.
+
+*Примечание:* для более user-friendly выдачи можно вспомнить про поименованные векторы.
+
+```{r}
+SumData2 <- function(path, filename){
+  full_path <- paste(path, filename, sep = "")
+  df <- read.csv(full_path)
+  nobs <- dim(df)[1]
+  nvars <- dim(df)[2]
+  n.na.rows <- sum(!complete.cases(df))
+  result <- c(observations = nobs, 
+              variables = nvars,
+              rows_with_na = n.na.rows)
+  return(result)
+}
+```
+
+Для проверки соберем маленькую базу вручную:
+
+```{r}
+A <- c(18, 22, 33, 19, 45, NA, 48, NA)
+B <- rep(c(0, 1), 4)
+C <- c(1, 4, 7, NA, 9, 0, 0, 1)
+data <- as.data.frame(cbind(A, B, C))
+data
+write.csv(data, "/home/oem/Dropbox/my_data.csv")
+
+# проверяем - указываем путь и название файла
+SumData2("/home/oem/Dropbox/", "my_data.csv")
+```
+
