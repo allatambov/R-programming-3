@@ -33,7 +33,7 @@ FH <- c(Albania = 3, Austria = 1, Bangladesh = 4, Romania = 2, Russia = 6, Chad 
 
 2) Напишите код, который выводит на экран каждый элемент вектора и добавляет (тоже выводит на экран) комментарии "This country is Free", "This country is Not Free", "This country is Partly Free" в зависимости от значения индекса Freedom House. Соответствие значений индекса типу страны -- см. в [таблице 3](https://freedomhouse.org/report/freedom-world-2016/methodology) в разделе Methodology на сайте Freedom House.
 
-**Задача 3.** Напишите код, который работает следующим образом -- см. примеры [здесь](https://github.com/allatambov/R-programming-4/blob/master/homeworks/hw6/hw6.png).
+**Задача 3.** Напишите код, который работает следующим образом -- см. пример [здесь](https://github.com/allatambov/R-programming-3/blob/master/homeworks/hw6/hw6.png)).
 
 *Примечание:* вместо слова "кот" может быть любой текст, отличный от слова "диплом" в разных регистрах (диплом, Диплом, ДИПЛОМ).
 
